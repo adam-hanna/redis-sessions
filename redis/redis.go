@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/adam-hanna/go-oauth2-server/config"
-	"github.com/adam-hanna/go-oauth2-server/session"
+	"github.com/RichardKnop/go-oauth2-server/config"
+	"github.com/RichardKnop/go-oauth2-server/session"
 	"github.com/gorilla/sessions"
 	redisStore "gopkg.in/boj/redistore.v1"
 )
