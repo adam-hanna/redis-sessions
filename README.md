@@ -11,6 +11,12 @@ go get https://github.com/adam-hanna/redis-sessions
 Within `github.com/RichardKnop/go-oauth2-server/cmd/run_server.go`
 
 ~~~go
+import (
+    ...
+    "github.com/adam-hanna/redis-sessions/redis"
+    ...
+)
+
 // RunServer runs the app
 func RunServer(configBackend string) error {
     ...
