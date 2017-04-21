@@ -5,25 +5,19 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/adam-hanna/go-oauth2-server/config"
 	"github.com/adam-hanna/go-oauth2-server/session"
 	"github.com/gorilla/sessions"
 	redisStore "gopkg.in/boj/redistore.v1"
 )
 
-// ConnectionConfigType is used to connect to the redis db
-type ConnectionConfigType struct {
+// ConfigType is used to connect to the redis db
+type ConfigType struct {
 	Size           int
 	Network        string
 	Address        string
 	Password       string
 	SessionSecrets [][]byte
-}
-
-// SessionOptionsType defines the options for the sessions
-type SessionOptionsType struct {
-	Path     string
-	MaxAge   int
-	HTTPOnly bool
 }
 
 // CustomSessionServiceType extends session.ServiceInterface
@@ -36,46 +30,9 @@ type CustomSessionServiceType struct {
 	w              http.ResponseWriter
 }
 
-var (
-	// ConnectionConfig ...
-	ConnectionConfig ConnectionConfigType
-	// SessionOptions ...
-	SessionOptions SessionOptionsType
-	// DefaultSize ...
-	DefaultSize = 10
-	// DefaultNetwork ...
-	DefaultNetwork = "tcp"
-	// DefaultAddress ...
-	DefaultAddress = ":6379"
-	// DefaultPassword ...
-	DefaultPassword = ""
-	// DefaultSessionSecrets ...
-	DefaultSessionSecrets = "The secret" // cnf.Session.Secret
-	// DefaultSessionOptionsPath ...
-	DefaultSessionOptionsPath = "/"
-	// DefaultSessionOptionsMaxAge ...
-	DefaultSessionOptionsMaxAge = 0
-	// DefaultSessionOptionsHTTPOnly ...
-	DefaultSessionOptionsHTTPOnly = true
-	// SessionService the service being exported
-	SessionService CustomSessionServiceType
-)
-
-func init() {
-	ConnectionConfig.Size = DefaultSize
-	ConnectionConfig.Network = DefaultNetwork
-	ConnectionConfig.Address = DefaultAddress
-	ConnectionConfig.Password = DefaultPassword
-	ConnectionConfig.SessionSecrets = make([][]byte, 1)
-	ConnectionConfig.SessionSecrets[0] = []byte(DefaultSessionSecrets)
-	SessionOptions.Path = DefaultSessionOptionsPath
-	SessionOptions.MaxAge = DefaultSessionOptionsMaxAge
-	SessionOptions.HTTPOnly = DefaultSessionOptionsHTTPOnly
-}
-
-// NewPluginService starts the redis connection and sets the session options
-func NewPluginService() *CustomSessionServiceType {
-	store, err := redisStore.NewRediStore(ConnectionConfig.Size, ConnectionConfig.Network, ConnectionConfig.Address, ConnectionConfig.Password, ConnectionConfig.SessionSecrets...)
+// NewService starts the redis connection and sets the session options
+func NewService(cnf *config.Config, redisConfig ConfigType) *CustomSessionServiceType {
+	store, err := redisStore.NewRediStore(redisConfig.Size, redisConfig.Network, redisConfig.Address, redisConfig.Password, redisConfig.SessionSecrets...)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -85,15 +42,11 @@ func NewPluginService() *CustomSessionServiceType {
 		sessionStore: store,
 		// Session options
 		sessionOptions: &sessions.Options{
-			Path:     SessionOptions.Path,
-			MaxAge:   SessionOptions.MaxAge,
-			HttpOnly: SessionOptions.HTTPOnly,
+			Path:     cnf.Session.Path,
+			MaxAge:   cnf.Session.MaxAge,
+			HttpOnly: cnf.Session.HTTPOnly,
 		},
 	}
-}
-
-func (c *CustomSessionServiceType) GetSessionService() session.ServiceInterface {
-	return c
 }
 
 // Close stops the redis connection
