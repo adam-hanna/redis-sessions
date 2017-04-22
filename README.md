@@ -1,6 +1,6 @@
 # Go redis-sessions
 
-This is a plugin for [github.com/RichardKnop/go-oauth2-server](https://github.com/RichardKnop/go-oauth2-server) that provides redis storage for sessions
+This is a plugin for [github.com/RichardKnop/go-oauth2-server](https://github.com/RichardKnop/go-oauth2-server) that provides redis storage for sessions. It wraps [github.com/boj/redistore](github.com/boj/redistore).
 
 ## Installation
 ~~~go
